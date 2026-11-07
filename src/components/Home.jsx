@@ -1,4 +1,5 @@
 import { ChevronIcon, InfoIcon } from './Icons.jsx'
+import Logo from './Logo.jsx'
 import { accentFor } from '../lib/modeStyle.js'
 import { formatHz, greetingFor } from '../lib/format.js'
 import { planFlicker } from '../engine/session.js'
@@ -51,10 +52,7 @@ export default function Home({ modes, lastMode, onNavigate }) {
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col px-5 pb-[max(2rem,env(safe-area-inset-bottom))] pt-[calc(env(safe-area-inset-top)+1.25rem)]">
       <header className="flex items-center justify-between">
-        <span className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.2em] text-mist">
-          <span aria-hidden="true" className="size-2 rounded-full bg-glow shadow-[0_0_10px_2px_var(--color-glow)]" />
-          Flicker
-        </span>
+        <Logo className="-ml-1 h-10 w-auto" weight={15} />
         <a
           href="#/info"
           onClick={(e) => {
