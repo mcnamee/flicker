@@ -28,6 +28,7 @@ The build uses a relative base (`./`), so it works from `https://<user>.github.i
 - `src/engine/audio.js` - Web Audio: binaural / isochronic beats, pink / brown noise, fades
 - `src/components/` - UI (home, mode sheet, consent, player, info)
 - `src/content.json` - modes, timers and info copy (mirrors `docs/content.json`)
+- `src/components/Logo.jsx` + `scripts/brand.cjs` - hand-lettered wordmark; run `node scripts/brand.cjs` to regenerate the icon, favicon and iOS launch images
 - `docs/SPEC.md` - product spec, research and acceptance criteria
 
 ## Agent team

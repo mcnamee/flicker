@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="8 6 380 160" role="img" aria-label="Flicker">
+<defs>
+  <radialGradient id="boot-orb" cx="40%" cy="35%" r="65%"><stop offset="0" stop-color="#fff1dc"/><stop offset=".45" stop-color="#f7c867"/><stop offset="1" stop-color="#e59e1b"/></radialGradient>
+  <radialGradient id="boot-halo"><stop offset="0" stop-color="#f2b33d" stop-opacity=".45"/><stop offset="1" stop-color="#f2b33d" stop-opacity="0"/></radialGradient>
+  <filter id="boot-goo" x="-10%" y="-20%" width="120%" height="140%"><feGaussianBlur in="SourceGraphic" stdDeviation="3.2"/><feColorMatrix values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -9"/></filter></defs>
+<g transform="translate(14 0) skewX(-8)">
+  <g fill="#f2b33d" filter="url(#boot-goo)">
+    <g fill="none" stroke="#f2b33d" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"><path d="M34 128 C46 108 50 72 54 48 C58 26 70 16 84 22"/><path d="M30 70 C48 68 64 64 80 60"/><path d="M118 22 C110 52 104 82 106 104 C107 114 114 114 120 108"/><path d="M138 70 C136 82 134 94 136 106"/><path d="M188 74 C180 64 160 66 158 86 C156 104 170 110 184 102"/><path d="M220 20 C216 52 212 82 212 106"/><path d="M248 64 C234 74 224 80 216 86 C228 90 238 98 248 110"/><path d="M272 90 C288 90 304 84 302 72 C300 62 278 62 274 82 C270 102 286 112 306 102"/><path d="M328 68 C328 82 326 94 326 106"/><path d="M327 84 C332 72 346 64 364 68"/></g>
+    <circle cx="34" cy="128" r="9"/><circle cx="86" cy="22" r="10"/><circle cx="82" cy="60" r="8.5"/><circle cx="118" cy="20" r="9.5"/><circle cx="188" cy="74" r="8.5"/><circle cx="184" cy="102" r="7.5"/><circle cx="220" cy="19" r="9.5"/><circle cx="250" cy="63" r="8.5"/><circle cx="250" cy="111" r="9"/><circle cx="308" cy="101" r="8.5"/><circle cx="366" cy="68" r="10"/><circle cx="326" cy="108" r="8"/>
+  </g><circle cx="146" cy="44" r="24" fill="url(#boot-halo)"/><circle class="orb" cx="146" cy="44" r="10" fill="url(#boot-orb)"/></g>
+<g transform="translate(232 128) rotate(-4)" fill="none" stroke="#a7a9c4" stroke-width="3" stroke-linecap="round">
+  <rect width="128" height="30" rx="15"/>
+  <path d="M-16 4 l10 6 M-14 14 l9 -2 M-8 -4 l3 9"/>
+  <text x="64" y="20.5" text-anchor="middle" stroke="none" fill="#a7a9c4" font-family="Arial Black, Arial, Helvetica, sans-serif" font-weight="900" font-size="13" letter-spacing="1.5">LIGHT + SOUND</text>
+</g>
+</svg>
