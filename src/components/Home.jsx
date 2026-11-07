@@ -4,11 +4,18 @@ import { formatHz, greetingFor } from '../lib/format.js'
 
 function ModeCard({ mode, lastUsed, onOpen }) {
   const accent = accentFor(mode.id)
+  const href = `#/mode/${encodeURIComponent(mode.id)}`
   return (
     <li>
-      <button
-        type="button"
-        onClick={() => onOpen(mode.id)}
+      <a
+        href={href}
+        onClick={(e) => {
+          e.preventDefault()
+          onOpen(href)
+        }}
+        data-testid="mode-card"
+        data-mode={mode.id}
+        aria-current={lastUsed ? 'true' : undefined}
         style={{ '--accent': accent }}
         className="group flex min-h-24 w-full items-center gap-4 rounded-3xl border border-night-700 bg-night-800/80 p-4 text-left transition active:scale-[0.99] active:bg-night-700 hover:border-(--accent)/50 motion-reduce:transition-none"
       >
@@ -34,12 +41,12 @@ function ModeCard({ mode, lastUsed, onOpen }) {
           </span>
         </span>
         <ChevronIcon className="shrink-0 text-night-600 transition group-hover:text-(--accent) motion-reduce:transition-none" />
-      </button>
+      </a>
     </li>
   )
 }
 
-export default function Home({ modes, lastMode, onOpenMode, onOpenInfo }) {
+export default function Home({ modes, lastMode, onNavigate }) {
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col px-5 pb-[max(2rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))]">
       <header className="flex items-center justify-between">
@@ -47,14 +54,18 @@ export default function Home({ modes, lastMode, onOpenMode, onOpenInfo }) {
           <span aria-hidden="true" className="size-2 rounded-full bg-glow shadow-[0_0_10px_2px_var(--color-glow)]" />
           Flicker
         </span>
-        <button
-          type="button"
-          onClick={onOpenInfo}
-          aria-label="About Flicker and safety information"
+        <a
+          href="#/info"
+          onClick={(e) => {
+            e.preventDefault()
+            onNavigate('#/info')
+          }}
+          data-testid="info-link"
+          aria-label="Why and how Flicker works, and safety information"
           className="-mr-2 grid size-11 place-items-center rounded-full text-mist transition hover:bg-night-800 hover:text-white motion-reduce:transition-none"
         >
           <InfoIcon />
-        </button>
+        </a>
       </header>
 
       <main className="flex-1">
@@ -63,7 +74,7 @@ export default function Home({ modes, lastMode, onOpenMode, onOpenInfo }) {
 
         <ul className="mt-7 space-y-3">
           {modes.map((m) => (
-            <ModeCard key={m.id} mode={m} lastUsed={m.id === lastMode} onOpen={onOpenMode} />
+            <ModeCard key={m.id} mode={m} lastUsed={m.id === lastMode} onOpen={onNavigate} />
           ))}
         </ul>
       </main>

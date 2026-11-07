@@ -18,34 +18,32 @@ export default function ConsentModal({ onContinue, onCancel }) {
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descId}
+        data-testid="consent"
         tabIndex={-1}
         className="animate-sheet relative max-h-[90dvh] w-full max-w-md overflow-y-auto rounded-3xl border border-night-600 bg-night-800 p-5 shadow-2xl"
       >
-        <h2 id={titleId} className="text-xl font-extrabold text-white">Before you begin</h2>
-        <div id={descId} className="mt-3 space-y-3 text-[15px] leading-relaxed text-mist">
-          <p className="font-semibold text-glow">Flickering light can trigger seizures in people with photosensitive epilepsy.</p>
-          <p>Please do not use Flicker if:</p>
-          <ul className="list-disc space-y-1 pl-5">
-            <li>you have epilepsy or a history of seizures</li>
-            <li>light triggers your migraines</li>
-            <li>you are pregnant, unless a doctor has said it is fine</li>
-          </ul>
-          <p>Flicker is not a medical treatment. Never use it while driving or doing anything that needs your attention. Stop straight away if you feel unwell, dizzy or uncomfortable.</p>
-        </div>
+        <h2 id={titleId} className="text-xl font-extrabold text-white">Before your first session</h2>
+        <p id={descId} className="mt-3 text-[15px] leading-relaxed text-mist">
+          Flicker uses flashing light. Flashing light can trigger seizures in people with photosensitive epilepsy,
+          sometimes for the first time. Don't use Flicker if you or a close family member have epilepsy or have had a
+          seizure. Never use it while driving or moving around. Stop straight away if you feel dizzy, sick, get a
+          headache or notice any twitching.
+        </p>
 
-        <label className="mt-5 flex min-h-11 cursor-pointer items-center gap-3 text-white">
+        <label className="mt-5 flex min-h-11 cursor-pointer items-start gap-3 text-white">
           <input
             type="checkbox"
             checked={agreed}
             onChange={(e) => setAgreed(e.target.checked)}
-            className="size-6 shrink-0 accent-glow"
+            className="mt-0.5 size-6 shrink-0 accent-glow"
           />
-          <span className="font-semibold">I understand and want to continue</span>
+          <span className="font-semibold">I've read this and I don't have epilepsy or a history of seizures.</span>
         </label>
 
         <div className="mt-5 grid grid-cols-2 gap-3">
           <button
             type="button"
+            data-testid="consent-cancel"
             onClick={onCancel}
             className="min-h-12 rounded-2xl border border-night-600 font-semibold text-mist hover:text-white"
           >
@@ -53,11 +51,12 @@ export default function ConsentModal({ onContinue, onCancel }) {
           </button>
           <button
             type="button"
+            data-testid="consent-accept"
             disabled={!agreed}
             onClick={onContinue}
             className="min-h-12 rounded-2xl bg-glow font-extrabold text-night-950 transition disabled:cursor-not-allowed disabled:opacity-30 motion-reduce:transition-none"
           >
-            Continue
+            Start
           </button>
         </div>
       </div>

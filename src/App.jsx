@@ -1,63 +1,71 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import content from './content.json'
 import Home from './components/Home.jsx'
-import ModeSheet from './components/ModeSheet.jsx'
+import ModeOptions from './components/ModeOptions.jsx'
 import ConsentModal from './components/ConsentModal.jsx'
 import Player from './components/Player.jsx'
 import Info from './components/Info.jsx'
-import { useHashView } from './hooks/useHashView.js'
+import { useRoute } from './hooks/useRoute.js'
 import { useSession } from './hooks/useSession.js'
-import { load, save } from './lib/storage.js'
+import { hasConsent, readPrefs, saveConsent, writePrefs } from './lib/prefs.js'
 
 export default function App() {
-  const { view, openInfo, goHome } = useHashView()
+  const { route, navigate, back } = useRoute()
   const session = useSession()
-  const [sheetId, setSheetId] = useState(null)
+  const [prefs, setPrefs] = useState(readPrefs)
   const [pending, setPending] = useState(null) // { mode, choices } awaiting consent
-  const [lastMode, setLastMode] = useState(() => load('lastMode', null))
 
-  const sheetMode = content.modes.find((m) => m.id === sheetId)
+  const mode = route.name === 'mode' ? content.modes.find((m) => m.id === route.id) : null
+  const view = mode ? 'mode' : route.name === 'info' ? 'info' : 'home'
+  const viewKey = mode ? mode.id : view
+
+  // Leaving a view ends any session and clears its notices.
+  const { reset } = session
+  useEffect(() => {
+    reset()
+  }, [viewKey, reset])
+
+  // A consent prompt belongs to the view it was opened on.
+  if (pending && pending.viewKey !== viewKey) setPending(null)
 
   // Called synchronously from a tap, so the session can start audio and camera on iOS.
-  function begin(mode, choices) {
-    setSheetId(null)
+  function begin(m, choices) {
     setPending(null)
-    session.launch({ mode, ...choices })
+    session.launch({ mode: m, ...choices })
   }
 
-  function handleStart(mode, choices) {
-    const stored = load('prefs', null)
-    const prefs = stored && typeof stored === 'object' ? stored : {}
-    save('prefs', {
+  function handleStart(m, choices) {
+    const next = {
       source: choices.source,
+      minutes: { ...prefs.minutes, [m.id]: choices.minutes },
+      lastMode: m.id,
       audioOn: choices.audioOn,
-      minutes: { ...prefs.minutes, [mode.id]: choices.minutes },
-    })
-    save('lastMode', mode.id)
-    setLastMode(mode.id)
-    if (load('consent', false) === true) begin(mode, choices)
-    else setPending({ mode, choices })
+    }
+    writePrefs(next)
+    setPrefs(next)
+    if (hasConsent()) begin(m, choices)
+    else setPending({ mode: m, choices, viewKey })
   }
 
   function handleConsent() {
-    save('consent', true)
+    saveConsent()
     begin(pending.mode, pending.choices)
   }
 
   return (
     <>
       <div inert={session.run !== null}>
-        {view === 'info' ? (
-          <Info content={content} onBack={goHome} />
-        ) : (
-          <Home modes={content.modes} lastMode={lastMode} onOpenMode={setSheetId} onOpenInfo={openInfo} />
-        )}
-        {view === 'home' && sheetMode && (
-          <ModeSheet
-            key={sheetMode.id}
-            mode={sheetMode}
+        {view === 'info' && <Info content={content} onBack={back} />}
+        {view === 'home' && <Home modes={content.modes} lastMode={prefs.lastMode} onNavigate={navigate} />}
+        {view === 'mode' && (
+          <ModeOptions
+            key={mode.id}
+            mode={mode}
             timers={content.timers}
-            onClose={() => setSheetId(null)}
+            prefs={prefs}
+            notice={session.notice}
+            onDismissNotice={session.clearNotice}
+            onBack={back}
             onStart={handleStart}
           />
         )}
@@ -70,7 +78,6 @@ export default function App() {
           overlayRef={session.overlayRef}
           onTapStop={session.tapStop}
           onEnd={session.end}
-          onSwitchToScreen={() => session.launch({ ...session.run, source: 'screen' })}
         />
       )}
     </>

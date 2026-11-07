@@ -1,16 +1,11 @@
-import { useId, useState } from 'react'
 import { BackIcon, ExternalIcon } from './Icons.jsx'
-
-const TABS = [
-  { id: 'why', label: 'Why' },
-  { id: 'how', label: 'How' },
-]
 
 function Why({ why }) {
   return (
-    <div className="space-y-6">
-      <p className="text-[15px] leading-relaxed text-mist">{why.intro}</p>
-      <ul className="space-y-4">
+    <section id="why" aria-labelledby="why-title" className="scroll-mt-20">
+      <h2 id="why-title" className="text-2xl font-extrabold text-white">Why</h2>
+      <p className="mt-3 text-[15px] leading-relaxed text-mist">{why.intro}</p>
+      <ul className="mt-5 space-y-3">
         {why.points.map((p) => (
           <li key={p.title} className="rounded-2xl border border-night-700 bg-night-800/70 p-4">
             <h3 className="font-semibold text-white">{p.title}</h3>
@@ -19,7 +14,7 @@ function Why({ why }) {
         ))}
       </ul>
       {why.references?.length > 0 && (
-        <section aria-label="References">
+        <div className="mt-6">
           <h3 className="mb-2 text-xs font-semibold uppercase tracking-widest text-mist">References</h3>
           <ol className="space-y-1">
             {why.references.map((r, i) => (
@@ -29,49 +24,54 @@ function Why({ why }) {
                   href={r.url}
                   target="_blank"
                   rel="noopener"
-                  className="inline-flex min-h-11 items-center gap-1.5 py-2 text-glow underline-offset-2 hover:underline"
+                  className="inline-flex min-h-11 items-start gap-1.5 py-2.5 text-glow underline-offset-2 [overflow-wrap:anywhere] hover:underline"
                 >
                   <span>{r.label}</span>
-                  <ExternalIcon className="size-4 shrink-0" />
+                  <ExternalIcon className="mt-0.5 size-4 shrink-0" />
                 </a>
               </li>
             ))}
           </ol>
-        </section>
+        </div>
       )}
-    </div>
+    </section>
   )
 }
 
 function How({ how }) {
   return (
-    <div className="space-y-6">
-      {how.sections.map((s) => (
-        <section key={s.title}>
-          <h3 className="mb-2 font-semibold text-white">{s.title}</h3>
-          <ol className="space-y-2">
-            {s.steps.map((step, i) => (
-              <li key={step} className="flex gap-3 text-[15px] leading-relaxed text-mist">
-                <span aria-hidden="true" className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-night-700 text-xs font-semibold text-white">
-                  {i + 1}
-                </span>
-                <span>{step}</span>
-              </li>
-            ))}
-          </ol>
-        </section>
-      ))}
-    </div>
+    <section id="how" aria-labelledby="how-title" className="scroll-mt-20">
+      <h2 id="how-title" className="text-2xl font-extrabold text-white">How</h2>
+      <div className="mt-4 space-y-6">
+        {how.sections.map((s) => (
+          <div key={s.title}>
+            <h3 className="mb-2 font-semibold text-white">{s.title}</h3>
+            <ol className="space-y-2">
+              {s.steps.map((step, i) => (
+                <li key={step} className="flex gap-3 text-[15px] leading-relaxed text-mist">
+                  <span
+                    aria-hidden="true"
+                    className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-night-700 text-xs font-semibold text-white"
+                  >
+                    {i + 1}
+                  </span>
+                  <span>{step}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+        ))}
+      </div>
+    </section>
   )
 }
 
 export default function Info({ content, onBack }) {
-  const [tab, setTab] = useState('why')
-  const uid = useId()
+  const jump = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 
   return (
     <div className="mx-auto min-h-dvh w-full max-w-md px-5 pb-[max(2rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))]">
-      <header className="flex items-center gap-1">
+      <header className="sticky top-0 z-10 -mx-5 flex items-center gap-1 bg-night-950/95 px-5 pb-2 pt-[max(0.25rem,env(safe-area-inset-top))] backdrop-blur">
         <button
           type="button"
           onClick={onBack}
@@ -80,37 +80,29 @@ export default function Info({ content, onBack }) {
         >
           <BackIcon />
         </button>
-        <h1 className="text-lg font-semibold text-white">About Flicker</h1>
+        <h1 className="flex-1 text-lg font-semibold text-white">About Flicker</h1>
+        <nav aria-label="Jump to" className="flex gap-1">
+          {['why', 'how'].map((id) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => jump(id)}
+              className="min-h-11 rounded-full px-4 text-sm font-semibold uppercase tracking-wide text-mist hover:text-white"
+            >
+              {id}
+            </button>
+          ))}
+        </nav>
       </header>
 
-      <div role="tablist" aria-label="Information" className="mt-5 grid grid-cols-2 gap-1 rounded-2xl bg-night-900 p-1">
-        {TABS.map((t) => (
-          <button
-            key={t.id}
-            id={`${uid}-tab-${t.id}`}
-            type="button"
-            role="tab"
-            aria-selected={tab === t.id}
-            aria-controls={`${uid}-panel`}
-            onClick={() => setTab(t.id)}
-            className={`min-h-11 rounded-xl text-sm font-semibold transition motion-reduce:transition-none ${
-              tab === t.id ? 'bg-night-600 text-white' : 'text-mist hover:text-white'
-            }`}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
+      <main className="mt-4 space-y-12">
+        <Why why={content.why} />
+        <How how={content.how} />
+      </main>
 
-      <div id={`${uid}-panel`} role="tabpanel" aria-labelledby={`${uid}-tab-${tab}`} className="mt-6">
-        {tab === 'why' ? <Why why={content.why} /> : <How how={content.how} />}
-      </div>
-
-      <aside className="mt-10 rounded-2xl border border-glow/30 bg-glow/5 p-4 text-sm leading-relaxed text-mist">
-        <h2 className="mb-1 font-semibold text-glow">Safety</h2>
-        Flickering light can trigger seizures. Do not use Flicker if you have epilepsy or a history of seizures, or if light
-        triggers your migraines. It is not a medical treatment, and it should never be used while driving. Stop if you feel unwell.
-      </aside>
+      <footer className="mt-12 rounded-2xl border border-glow/30 bg-glow/5 p-4 text-sm leading-relaxed text-mist">
+        Flicker is not a medical device. Don't use it if you have epilepsy or a history of seizures.
+      </footer>
     </div>
   )
 }
