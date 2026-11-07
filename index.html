@@ -13,10 +13,24 @@
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
     <link rel="manifest" href="./manifest.webmanifest" />
+    <style>
+      /* Paint dark and show a splash before the app's CSS and JS load. */
+      html, body { margin: 0; background: #07080f; color-scheme: dark; }
+      .boot { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; }
+      .boot-orb { width: 56px; height: 56px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #fff1dc, #f7c867 45%, #e59e1b); box-shadow: 0 0 40px 12px rgba(242, 179, 61, .35), 0 0 0 14px rgba(242, 179, 61, .12), 0 0 0 30px rgba(242, 179, 61, .06); animation: boot-pulse 1.6s ease-in-out infinite; }
+      .boot-name { font: 600 13px/1 ui-sans-serif, system-ui, -apple-system, sans-serif; letter-spacing: .3em; text-transform: uppercase; color: #a7a9c4; padding-left: .3em; }
+      @keyframes boot-pulse { 50% { transform: scale(.92); opacity: .8; } }
+      @media (prefers-reduced-motion: reduce) { .boot-orb { animation: none; } }
+    </style>
     <title>Flicker</title>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div class="boot" aria-label="Loading Flicker">
+        <div class="boot-orb"></div>
+        <div class="boot-name">Flicker</div>
+      </div>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
