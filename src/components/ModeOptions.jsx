@@ -2,6 +2,7 @@ import { useId, useState } from 'react'
 import { BackIcon } from './Icons.jsx'
 import { accentFor } from '../lib/modeStyle.js'
 import { formatHz } from '../lib/format.js'
+import { planFlicker } from '../engine/session.js'
 
 const SOURCES = [
   { id: 'screen', label: 'Screen', hint: 'Flickers your whole screen. Works on any phone. Hold it close with your eyes closed.' },
@@ -50,7 +51,7 @@ function Notice({ notice, onUseScreen }) {
       <div role="status" className="mb-5 rounded-2xl border border-night-600 bg-night-900 p-4">
         <p className="font-semibold text-white">Session complete</p>
         <p className="text-sm text-mist">
-          {notice.minutes} {notice.minutes === 1 ? 'minute' : 'minutes'} of {notice.name.toLowerCase()}. Well done.
+          {notice.name}, {notice.minutes} {notice.minutes === 1 ? 'minute' : 'minutes'}. Take a moment before you get up.
         </p>
       </div>
     )
@@ -76,6 +77,7 @@ export default function ModeOptions({ mode, timers, prefs, notice, onDismissNoti
   const accent = accentFor(mode.id)
   const binaural = mode.audio?.beatType === 'binaural'
   const sourceHint = SOURCES.find((s) => s.id === choices.source).hint
+  const plan = planFlicker(mode.flicker, choices.source, choices.minutes * 60)
   const set = (patch) => setChoices((c) => ({ ...c, ...patch }))
   const selected = { backgroundColor: accent, borderColor: accent }
 
@@ -100,7 +102,9 @@ export default function ModeOptions({ mode, timers, prefs, notice, onDismissNoti
       <main>
         <h1 className="mt-4 text-4xl font-extrabold tracking-tight text-white">{mode.name}</h1>
         <p className="mt-1 text-sm font-semibold tabular-nums" style={{ color: accent }}>
-          {formatHz(mode.flicker.startHz)} to {formatHz(mode.flicker.targetHz)} Hz
+          {plan.startHz === plan.targetHz
+            ? `${formatHz(plan.targetHz)} Hz`
+            : `${formatHz(plan.startHz)} to ${formatHz(plan.targetHz)} Hz`}
         </p>
         <p className="mt-4 text-[15px] leading-relaxed text-mist">{mode.description}</p>
 

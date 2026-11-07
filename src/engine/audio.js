@@ -4,7 +4,8 @@
 // Noise: generated pink or brown noise loop, about 12 dB under the tones.
 
 const TONE_LEVEL = 0.25
-const NOISE_LEVEL = TONE_LEVEL / 4 // about -12 dB
+// Noise buffers sit around 0.2 RMS vs a sine's 0.707, so this lands about 12 dB under the tones.
+const NOISE_LEVEL = TONE_LEVEL * 0.9
 const EDGE = 0.005 // isochronic gate edge, seconds
 const LOOKAHEAD = 0.15 // isochronic scheduling window, seconds
 

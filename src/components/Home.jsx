@@ -1,6 +1,7 @@
 import { ChevronIcon, InfoIcon } from './Icons.jsx'
 import { accentFor } from '../lib/modeStyle.js'
 import { formatHz, greetingFor } from '../lib/format.js'
+import { planFlicker } from '../engine/session.js'
 
 function ModeCard({ mode, lastUsed, onOpen }) {
   const accent = accentFor(mode.id)
@@ -37,7 +38,7 @@ function ModeCard({ mode, lastUsed, onOpen }) {
           </span>
           <span className="mt-0.5 block text-sm text-mist">{mode.tagline}</span>
           <span className="mt-1.5 block text-xs font-semibold tabular-nums text-(--accent)">
-            {formatHz(mode.flicker.targetHz)} Hz
+            {formatHz(planFlicker(mode.flicker, 'screen', 3600).targetHz)} Hz
           </span>
         </span>
         <ChevronIcon className="shrink-0 text-night-600 transition group-hover:text-(--accent) motion-reduce:transition-none" />

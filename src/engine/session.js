@@ -88,7 +88,7 @@ export function startSession(opts) {
     clearInterval(s.tick)
     document.removeEventListener('visibilitychange', onHidden)
     if (overlay) overlay.style.backgroundColor = OFF // light stops on this frame
-    if (s.track) {
+    if (s.track && s.torchOn) {
       try { s.track.applyConstraints({ advanced: [{ torch: false }] }).catch(() => {}) } catch { /* ignore */ }
     }
     s.stream?.getTracks().forEach((t) => t.stop())
@@ -188,7 +188,8 @@ async function runTorch(s, plan, elapsed, durationSec, fail) {
   document.body.appendChild(video)
   video.srcObject = stream
   s.video = video
-  try { await video.play() } catch { /* still works on most devices */ }
+  // Some devices never settle play(); don't let that hang the torch.
+  try { await Promise.race([video.play(), sleep(2000)]) } catch { /* still works on most devices */ }
   if (!s.running || s.track !== track) return
 
   const caps = track.getCapabilities ? track.getCapabilities() : {}
@@ -198,30 +199,36 @@ async function runTorch(s, plan, elapsed, durationSec, fail) {
   }
 
   // The torch can't dim: it stays off for the 10 s fade-in and switches off at the start of the fade-out.
+  // Each toggle is scheduled against an absolute edge time, so latency doesn't accumulate.
+  // A floor of 97% of a half-cycle between toggles stops a late edge being followed by a short flash.
   let on = false
-  let cycle = 0
-  let last = performance.now()
-  while (s.running && s.track === track) {
-    const now = performance.now()
-    const t = elapsed()
-    cycle = (cycle + hzAt(plan, t) * ((now - last) / 1000)) % 1
-    last = now
-    const active = t >= FADE && t < durationSec - FADE
-    if (!active) cycle = 0
-    const want = active && cycle < 0.5
-    if (want !== on) {
-      on = want
-      try {
-        await track.applyConstraints({ advanced: [{ torch: on }] })
-      } catch {
-        if (s.running && s.track === track) fail('The torch stopped responding. Try Screen instead.')
-        return
+  let next = null
+  const set = async (value) => {
+    on = value
+    s.torchOn = value
+    await track.applyConstraints({ advanced: [{ torch: value }] })
+  }
+  try {
+    while (s.running && s.track === track) {
+      const t = elapsed()
+      const active = t >= FADE && t < durationSec - FADE
+      if (!active) {
+        if (on) await set(false)
+        next = null
+        await sleep(Math.max(1, Math.min(100, (FADE - t) * 1000)))
+        continue
       }
-      if (!s.running) return
+      const now = performance.now()
+      if (next === null || now - next > 500) next = now // first edge, or resync after a stall
+      if (now >= next) {
+        await set(!on)
+        if (!s.running) return
+        const half = 500 / hzAt(plan, elapsed())
+        next = Math.max(next + half, now + half * 0.97)
+      }
+      await sleep(Math.max(1, next - performance.now()))
     }
-    // Sleep to the next half-cycle edge, bounded so the ramp stays responsive.
-    const hz = hzAt(plan, elapsed())
-    const toEdge = ((0.5 - (cycle % 0.5)) / hz) * 1000
-    await sleep(active ? clamp(toEdge, 1, 50) : 100)
+  } catch {
+    if (s.running && s.track === track) fail('The torch stopped responding. Try Screen instead.')
   }
 }

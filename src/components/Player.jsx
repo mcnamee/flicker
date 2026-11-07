@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { formatClock, formatHz } from '../lib/format.js'
+import { planFlicker } from '../engine/session.js'
 
 const HINT_MS = 3000
 
@@ -38,8 +39,7 @@ export default function Player({ run, tick, overlayRef, onTapStop, onEnd }) {
 
   const total = minutes * 60
   const remaining = tick ? tick.remainingSec : total
-  const hz = tick ? tick.hz : mode.flicker.startHz
-  const progress = tick ? Math.min(1, tick.elapsedSec / total) : 0
+  const hz = tick ? tick.hz : planFlicker(mode.flicker, torch ? 'torch' : 'screen', total).startHz
 
   return (
     <div
@@ -53,13 +53,6 @@ export default function Player({ run, tick, overlayRef, onTapStop, onEnd }) {
     >
       {!torch && <Hint />}
 
-      {!torch && (
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute bottom-0 left-0 h-0.5 w-full origin-left bg-white opacity-30 mix-blend-difference"
-          style={{ transform: `scaleX(${progress})` }}
-        />
-      )}
 
       {torch && (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-8 pb-[max(2rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))] text-center text-mist/70">

@@ -4,7 +4,7 @@
       "id": "dream",
       "name": "Dream",
       "tagline": "Eyes-closed colour and pattern",
-      "description": "Steady 10 Hz light, the rate that produces the strongest colours, shapes and movement behind closed eyes in lab studies. Crisp pulsed tones keep time with the light.",
+      "description": "Light that settles on 10 Hz, the rate that produces the strongest colours, shapes and movement behind closed eyes in lab studies. Crisp pulsed tones keep time with the light.",
       "flicker": { "startHz": 12, "targetHz": 10, "rampSec": 45 },
       "audio": { "beatType": "isochronic", "beatHz": 10, "carrierHz": 260, "noise": "none" },
       "defaultMinutes": 10
