@@ -85,7 +85,7 @@ export default function ModeOptions({ mode, timers, prefs, notice, onDismissNoti
     <div
       data-testid="options"
       data-mode={mode.id}
-      className="mx-auto min-h-dvh w-full max-w-md px-5 pb-[max(2rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))]"
+      className="mx-auto min-h-dvh w-full max-w-md px-5 pb-[max(2rem,env(safe-area-inset-bottom))] pt-[calc(env(safe-area-inset-top)+1.25rem)]"
     >
       <header className="flex items-center">
         <button

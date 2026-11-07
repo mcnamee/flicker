@@ -72,8 +72,8 @@ export default function Info({ content, onBack }) {
   const jump = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 
   return (
-    <div className="mx-auto min-h-dvh w-full max-w-md px-5 pb-[max(2rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))]">
-      <header className="sticky top-0 z-10 -mx-5 flex items-center gap-1 bg-night-950/95 px-5 pb-2 pt-[max(0.25rem,env(safe-area-inset-top))] backdrop-blur">
+    <div className="mx-auto min-h-dvh w-full max-w-md px-5 pb-[max(2rem,env(safe-area-inset-bottom))]">
+      <header className="sticky top-0 z-10 -mx-5 flex items-center gap-1 bg-night-950/95 px-5 pb-2 pt-[calc(env(safe-area-inset-top)+1.25rem)] backdrop-blur">
         <button
           type="button"
           onClick={onBack}
