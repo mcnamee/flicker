@@ -1,0 +1,124 @@
+{
+  "modes": [
+    {
+      "id": "dream",
+      "name": "Dream",
+      "tagline": "Eyes-closed colour and pattern",
+      "description": "Light that settles on 10 Hz, the rate that produces the strongest colours, shapes and movement behind closed eyes in lab studies. Crisp pulsed tones keep time with the light.",
+      "flicker": { "startHz": 12, "targetHz": 10, "rampSec": 45 },
+      "audio": { "beatType": "isochronic", "beatHz": 10, "carrierHz": 260, "noise": "none" },
+      "defaultMinutes": 10
+    },
+    {
+      "id": "relax",
+      "name": "Relax",
+      "tagline": "Slow down and let go",
+      "description": "Starts near your natural resting rhythm and drifts down to a slower, calmer 7.5 Hz. Soft beats and pink noise in headphones help you settle.",
+      "flicker": { "startHz": 10, "targetHz": 7.5, "rampSec": 120 },
+      "audio": { "beatType": "binaural", "beatHz": 7.5, "carrierHz": 220, "noise": "pink" },
+      "defaultMinutes": 10
+    },
+    {
+      "id": "meditate",
+      "name": "Meditate",
+      "tagline": "Quiet, inward focus",
+      "description": "Glides from 10 Hz down to 6 Hz, the theta range often seen during meditation. Gentle pulsed tones work through the speaker, so headphones are optional.",
+      "flicker": { "startHz": 10, "targetHz": 6, "rampSec": 180 },
+      "audio": { "beatType": "isochronic", "beatHz": 6, "carrierHz": 180, "noise": "none" },
+      "defaultMinutes": 15
+    },
+    {
+      "id": "sleep",
+      "name": "Sleep",
+      "tagline": "Wind down for bed",
+      "description": "A slow five-minute slide from 10 Hz to 3 Hz, the deep-sleep range, with low beats and warm brown noise. Use the screen on low brightness and let the session fade out on its own.",
+      "flicker": { "startHz": 10, "targetHz": 3, "rampSec": 300 },
+      "audio": { "beatType": "binaural", "beatHz": 3, "carrierHz": 150, "noise": "brown" },
+      "defaultMinutes": 20
+    }
+  ],
+  "timers": [5, 10, 15, 20, 30],
+  "why": {
+    "intro": "Flicker uses steady pulses of light and sound to give your brain a rhythm to follow. Some of this is well studied and some is still early, so here is what the research does and does not show.",
+    "points": [
+      {
+        "title": "Your brain follows a steady rhythm",
+        "body": "When light flickers at a steady rate, the visual part of your brain starts to pulse at the same rate. This works best when the flicker is close to your own natural rhythm, which for most adults sits around 10 beats per second (10 Hz). That is why every session starts near 10 Hz."
+      },
+      {
+        "title": "Why you see colours and patterns",
+        "body": "With your eyes closed, flicker often produces vivid colours, geometric shapes and movement. Lab studies found these effects are strongest at about 10 Hz, and much weaker when the same number of flashes arrive at random. The patterns come from your own visual system and fade as soon as the light stops."
+      },
+      {
+        "title": "Why sessions start fast and slow down",
+        "body": "Your brain locks on most easily near its own rhythm, then can be led a little way from it. So Relax, Meditate and Sleep start near 10 Hz and glide down to a slower target. This ramp is a design choice based on that research. It has not been tested as a treatment."
+      },
+      {
+        "title": "About the beats",
+        "body": "Binaural beats play a slightly different tone in each ear, and your brain hears the difference as a slow pulse. They need headphones. Isochronic tones are a single tone switched on and off, so they work through the speaker. A review of 22 studies found binaural beats had a moderate effect on anxiety, memory, attention and pain. Another review found brainwave studies disagree on whether the beats actually change brain rhythms. One small study found a 3 Hz binaural beat lengthened deep sleep."
+      },
+      {
+        "title": "About the noise",
+        "body": "Relax and Sleep add soft pink or brown noise to mask background sounds. A large review found evidence that steady noise helps sleep is very weak and mixed, so keep the volume low and turn it off if it bothers you."
+      },
+      {
+        "title": "What we don't claim",
+        "body": "Flicker is for relaxation and curiosity. It is not a medical device and does not treat any condition. Most studies are small and effects vary a lot between people."
+      },
+      {
+        "title": "Safety",
+        "body": "Flashing light can trigger seizures in up to 1 in 4000 people, and flashes between 3 and 60 Hz carry the most risk. Do not use Flicker if you have epilepsy, a history of seizures, or a family history of photosensitivity. Stop straight away if you feel unwell."
+      }
+    ],
+    "references": [
+      { "label": "Notbohm, Kurths & Herrmann (2016). Rhythmic light stimulation entrains brain oscillations. Frontiers in Human Neuroscience.", "url": "https://doi.org/10.3389/fnhum.2016.00010" },
+      { "label": "Amaya et al. (2023). Effect of frequency and rhythmicity on flicker light-induced hallucinatory phenomena. PLOS ONE.", "url": "https://doi.org/10.1371/journal.pone.0284271" },
+      { "label": "Bartossek, Kemmerer & Schmidt (2021). Altered states phenomena induced by visual flicker light stimulation. PLOS ONE.", "url": "https://doi.org/10.1371/journal.pone.0253779" },
+      { "label": "Garcia-Argibay, Santed & Reales (2019). Efficacy of binaural auditory beats in cognition, anxiety, and pain perception: a meta-analysis. Psychological Research.", "url": "https://doi.org/10.1007/s00426-018-1066-8" },
+      { "label": "Ingendoh, Posny & Heine (2023). Binaural beats to entrain the brain? A systematic review. PLOS ONE.", "url": "https://doi.org/10.1371/journal.pone.0286023" },
+      { "label": "Jirakittayakorn & Wongsawat (2018). Effects of a 3-Hz binaural beat on sleep stages during sleep. Frontiers in Human Neuroscience.", "url": "https://doi.org/10.3389/fnhum.2018.00387" },
+      { "label": "Riedy et al. (2021). Noise as a sleep aid: a systematic review. Sleep Medicine Reviews.", "url": "https://doi.org/10.1016/j.smrv.2020.101385" },
+      { "label": "Fisher et al. (2022). Visually sensitive seizures: an updated review by the Epilepsy Foundation. Epilepsia.", "url": "https://doi.org/10.1111/epi.17175" }
+    ]
+  },
+  "how": {
+    "sections": [
+      {
+        "title": "Before you start",
+        "steps": [
+          "Find a dark, quiet spot where you can sit back or lie down. Never use Flicker while driving, walking or doing anything that needs your eyes.",
+          "Turn on Do Not Disturb so notifications don't interrupt the light.",
+          "Use headphones for Relax and Sleep. Their binaural beats only work with a separate sound in each ear. Dream and Meditate work through the speaker too.",
+          "Start with the volume low and raise it until the tones are just comfortable."
+        ]
+      },
+      {
+        "title": "Using the screen",
+        "steps": [
+          "Turn your screen brightness right up (or lower for Sleep, so the light isn't harsh at bedtime).",
+          "Close your eyes before the session starts, then hold the phone or rest it 10 to 15 cm in front of your face, screen towards you.",
+          "Keep the phone centred and still. The light should fill most of what you'd see if your eyes were open.",
+          "Keep your eyes closed the whole time. The colours and patterns appear behind your eyelids."
+        ]
+      },
+      {
+        "title": "Using the torch",
+        "steps": [
+          "Allow camera access when asked. The torch is part of the camera, but nothing is recorded.",
+          "The torch is much brighter than the screen. Hold the phone or rest it about 30 cm away, with the back of the phone facing your closed eyes.",
+          "Never look into the torch with your eyes open.",
+          "Keep Flicker open with the screen on. Locking the phone or switching apps ends the session.",
+          "The torch can't dim, so it simply switches on after the audio has faded in, and off the moment you stop."
+        ]
+      },
+      {
+        "title": "Stopping",
+        "steps": [
+          "Tap anywhere on the screen to stop at any time. The light stops straight away and the sound fades out.",
+          "Stop if you get a headache, feel dizzy, sick or uneasy, or notice any twitching. Open your eyes and rest before standing up.",
+          "When the timer ends, the light and sound fade out on their own."
+        ]
+      }
+    ]
+  }
+}
