@@ -1,8 +1,12 @@
-// Synthesised session audio: binaural or isochronic beat over a carrier, plus a noise bed.
-// Everything is generated with Web Audio, no files.
+// Synthesised session audio (Web Audio only, no files).
+// Binaural: two sines, L = carrier - beat/2, R = carrier + beat/2.
+// Isochronic: one sine at the carrier, gated on/off at the beat rate with ~5 ms edges.
+// Noise: generated pink or brown noise loop, about 12 dB under the tones.
 
-const FADE_IN = 4
-const FADE_OUT = 4
+const TONE_LEVEL = 0.25
+const NOISE_LEVEL = TONE_LEVEL / 4 // about -12 dB
+const EDGE = 0.005 // isochronic gate edge, seconds
+const LOOKAHEAD = 0.15 // isochronic scheduling window, seconds
 
 function noiseBuffer(ctx, colour, seconds = 8) {
   const len = Math.floor(ctx.sampleRate * seconds)
@@ -30,7 +34,7 @@ function noiseBuffer(ctx, colour, seconds = 8) {
         b6 = w * 0.115926
       }
     }
-    // Short crossfade so the loop point doesn't click.
+    // Crossfade the loop point so it doesn't click.
     const xf = Math.floor(ctx.sampleRate * 0.05)
     for (let i = 0; i < xf; i++) {
       const g = i / xf
@@ -41,99 +45,105 @@ function noiseBuffer(ctx, colour, seconds = 8) {
 }
 
 /**
- * Create (synchronously, inside a user gesture) the audio graph for a recipe.
- * recipe: { beatType: 'binaural'|'isochronic', beatHz, carrierHz, noise: 'pink'|'brown'|'none' }
- * ramp: { startHz, rampSec } - the beat glides from startHz to beatHz alongside the light.
+ * Build and start the audio graph. Call synchronously inside a user gesture (iOS).
+ * recipe: { beatType: 'binaural'|'isochronic', carrierHz, noise: 'pink'|'brown'|'none' }
+ * beat: { startHz, targetHz, rampSec } - beat glides linearly in lockstep with the light.
+ * fadeInSec: master fade-in.
  */
-export function createAudio(recipe, ramp, volume = 0.8) {
+export function createAudio(recipe, beat, fadeInSec = 10) {
   const AC = window.AudioContext || window.webkitAudioContext
   if (!AC) return null
-  // iOS 17+: play through the silent switch.
-  try { if (navigator.audioSession) navigator.audioSession.type = 'playback' } catch { /* ignore */ }
+  try { if (navigator.audioSession) navigator.audioSession.type = 'playback' } catch { /* iOS 17+ only */ }
 
   const ctx = new AC()
-  const now = ctx.currentTime
+  const t0 = ctx.currentTime
   const master = ctx.createGain()
-  master.gain.setValueAtTime(0, now)
-  master.gain.linearRampToValueAtTime(volume, now + FADE_IN)
+  master.gain.setValueAtTime(0, t0)
+  master.gain.linearRampToValueAtTime(1, t0 + fadeInSec)
   master.connect(ctx.destination)
 
-  const nodes = []
-  const startBeat = ramp?.startHz ?? recipe.beatHz
-  const rampSec = ramp?.rampSec ?? 0
-  const glide = (param, from, to) => {
-    param.setValueAtTime(from, now)
-    if (rampSec > 0 && from !== to) param.linearRampToValueAtTime(to, now + rampSec)
-    else param.setValueAtTime(to, now)
+  const beatAt = (sec) => {
+    if (!beat.rampSec || sec >= beat.rampSec) return beat.targetHz
+    return beat.startHz + (beat.targetHz - beat.startHz) * (sec / beat.rampSec)
   }
+
+  const sources = []
+  let gateTimer = 0
 
   if (recipe.beatType === 'binaural') {
     const merger = ctx.createChannelMerger(2)
-    const toneGain = ctx.createGain()
-    toneGain.gain.value = 0.22
-    merger.connect(toneGain).connect(master)
+    const tone = ctx.createGain()
+    tone.gain.value = TONE_LEVEL
+    merger.connect(tone).connect(master)
     const c = recipe.carrierHz
-    const left = ctx.createOscillator()
-    const right = ctx.createOscillator()
-    glide(left.frequency, c - startBeat / 2, c - recipe.beatHz / 2)
-    glide(right.frequency, c + startBeat / 2, c + recipe.beatHz / 2)
-    left.connect(merger, 0, 0)
-    right.connect(merger, 0, 1)
-    nodes.push(left, right)
+    ;[-1, 1].forEach((side, ch) => {
+      const osc = ctx.createOscillator()
+      osc.frequency.setValueAtTime(c + (side * beat.startHz) / 2, t0)
+      if (beat.rampSec > 0) osc.frequency.linearRampToValueAtTime(c + (side * beat.targetHz) / 2, t0 + beat.rampSec)
+      osc.connect(merger, 0, ch)
+      sources.push(osc)
+    })
   } else {
-    // Isochronic: carrier amplitude-modulated by a sine LFO at the beat rate.
-    const carrier = ctx.createOscillator()
-    carrier.frequency.value = recipe.carrierHz
-    const am = ctx.createGain()
-    am.gain.value = 0.5
-    const lfo = ctx.createOscillator()
-    glide(lfo.frequency, startBeat, recipe.beatHz)
-    const depth = ctx.createGain()
-    depth.gain.value = 0.5
-    lfo.connect(depth).connect(am.gain)
-    const toneGain = ctx.createGain()
-    toneGain.gain.value = 0.2
-    carrier.connect(am).connect(toneGain).connect(master)
-    nodes.push(carrier, lfo)
+    const osc = ctx.createOscillator()
+    osc.frequency.value = recipe.carrierHz
+    const gate = ctx.createGain()
+    gate.gain.setValueAtTime(0, t0)
+    const tone = ctx.createGain()
+    tone.gain.value = TONE_LEVEL
+    osc.connect(gate).connect(tone).connect(master)
+    sources.push(osc)
+
+    // Lookahead scheduler: phase-accumulate the (ramping) beat and schedule each gate edge.
+    let phase = 0
+    let cursor = t0
+    const step = 0.002
+    let open = false
+    const schedule = () => {
+      const horizon = ctx.currentTime + LOOKAHEAD
+      while (cursor < horizon) {
+        phase = (phase + beatAt(cursor - t0) * step) % 1
+        const want = phase < 0.5
+        if (want !== open) {
+          open = want
+          gate.gain.setValueAtTime(open ? 0 : 1, cursor)
+          gate.gain.linearRampToValueAtTime(open ? 1 : 0, cursor + EDGE)
+        }
+        cursor += step
+      }
+    }
+    schedule()
+    gateTimer = setInterval(schedule, 40)
   }
 
-  if (recipe.noise && recipe.noise !== 'none') {
+  if (recipe.noise === 'pink' || recipe.noise === 'brown') {
     const src = ctx.createBufferSource()
     src.buffer = noiseBuffer(ctx, recipe.noise)
     src.loop = true
-    const lp = ctx.createBiquadFilter()
-    lp.type = 'lowpass'
-    lp.frequency.value = recipe.noise === 'brown' ? 900 : 4000
     const ng = ctx.createGain()
-    ng.gain.value = recipe.noise === 'brown' ? 0.35 : 0.18
-    src.connect(lp).connect(ng).connect(master)
-    nodes.push(src)
+    ng.gain.value = NOISE_LEVEL
+    src.connect(ng).connect(master)
+    src.noiseColour = recipe.noise
+    sources.push(src)
   }
 
-  nodes.forEach((n) => n.start(now))
+  sources.forEach((n) => n.start(t0))
   if (ctx.state === 'suspended') ctx.resume().catch(() => {})
 
   let closed = false
+  const fadeTo = (v, sec) => {
+    const t = ctx.currentTime
+    master.gain.cancelScheduledValues(t)
+    master.gain.setValueAtTime(master.gain.value, t)
+    master.gain.linearRampToValueAtTime(v, t + sec)
+  }
   return {
     ctx,
-    setVolume(v) {
-      if (closed) return
-      const t = ctx.currentTime
-      master.gain.cancelScheduledValues(t)
-      master.gain.setValueAtTime(master.gain.value, t)
-      master.gain.linearRampToValueAtTime(v, t + 0.2)
-    },
-    fadeOut(sec = FADE_OUT) {
-      if (closed) return
-      const t = ctx.currentTime
-      master.gain.cancelScheduledValues(t)
-      master.gain.setValueAtTime(master.gain.value, t)
-      master.gain.linearRampToValueAtTime(0, t + sec)
-    },
+    fadeOut(sec) { if (!closed) fadeTo(0, sec) },
     close() {
       if (closed) return
       closed = true
-      nodes.forEach((n) => { try { n.stop() } catch { /* already stopped */ } })
+      clearInterval(gateTimer)
+      sources.forEach((n) => { try { n.stop() } catch { /* already stopped */ } })
       ctx.close().catch(() => {})
     },
   }

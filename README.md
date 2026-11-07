@@ -1,6 +1,6 @@
 # Flicker
 
-Light and sound sessions for sleep, calm and focus. A phone-first React + Tailwind single page app that strobes the screen or the phone torch at a set frequency, paired with synthesised binaural or isochronic audio. No accounts, no tracking - preferences are kept in local storage.
+Light and sound sessions for dreamy visuals, calm and sleep. A phone-first React + Tailwind single page app that strobes the screen or the phone torch at a set frequency, paired with synthesised binaural or isochronic audio. No accounts, no tracking - preferences are kept in local storage.
 
 > **Safety:** flashing light can trigger seizures in people with photosensitive epilepsy. Don't use Flicker if you have epilepsy or a history of seizures.
 
