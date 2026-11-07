@@ -1,4 +1,5 @@
 import { BackIcon, ExternalIcon } from './Icons.jsx'
+import HowArt from './HowArt.jsx'
 
 function Why({ why }) {
   return (
@@ -46,6 +47,7 @@ function How({ how }) {
         {how.sections.map((s) => (
           <div key={s.title}>
             <h3 className="mb-2 font-semibold text-white">{s.title}</h3>
+            <HowArt title={s.title} />
             <ol className="space-y-2">
               {s.steps.map((step, i) => (
                 <li key={step} className="flex gap-3 text-[15px] leading-relaxed text-mist">
